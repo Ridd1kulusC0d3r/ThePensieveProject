@@ -15,6 +15,7 @@ import sys
 from pensieve_timeline.correlation import correlate
 from pensieve_timeline.integrity import fingerprint
 from pensieve_timeline.io import (
+    read_jsonl,
     write_csv,
     write_entities,
     write_jsonl,
@@ -132,6 +133,7 @@ def run_forensic(
         "case_id": workspace.name,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "input": evidence,
+        "input_mode": input_mode,
         "event_count": len(events),
         "correlation_count": len(links),
         "extended_parsers": extended_parsers,
@@ -156,6 +158,7 @@ def run_ai(
     labels=None,
     max_events: int = 40,
     max_message_chars: int = 700,
+    canonical_timeline: bool = False,
 ) -> dict:
     """Run the AI analyst profile.
 
@@ -166,10 +169,16 @@ def run_ai(
     workspace = _workspace(workspace_root, case_id)
     evidence = fingerprint(input_path)
 
-    events = ingest(
-        [input_path],
-        include_optional=extended_parsers,
-    )
+    if canonical_timeline:
+        events = read_jsonl(input_path)
+        input_mode = "canonical_timeline"
+    else:
+        events = ingest(
+            [input_path],
+            include_optional=extended_parsers,
+        )
+        input_mode = "evidence"
+
     links = correlate(
         events,
         window_seconds=correlation_window,
@@ -319,6 +328,11 @@ def _parser() -> argparse.ArgumentParser:
     ai.add_argument("--labels", nargs="*")
     ai.add_argument("--max-events", type=int, default=40)
     ai.add_argument("--max-message-chars", type=int, default=700)
+    ai.add_argument(
+        "--canonical-timeline",
+        action="store_true",
+        help="Treat input as an existing Pensieve timeline.jsonl instead of re-ingesting evidence.",
+    )
 
     serve = sub.add_parser(
         "serve",
@@ -362,6 +376,7 @@ def main(argv=None) -> int:
                 labels=args.labels,
                 max_events=args.max_events,
                 max_message_chars=args.max_message_chars,
+                canonical_timeline=args.canonical_timeline,
             )
         else:
             serve_dashboard(
