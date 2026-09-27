@@ -1,7 +1,33 @@
 {
-  "catalog_version": "1.0",
+  "catalog_version": "1.1",
   "updated": "2026-09-27",
   "sources": [
+    {
+      "id": "pensieve-first-investigation",
+      "name": "Pensieve First Investigation synthetic labs",
+      "url": "examples/first-investigation/",
+      "kind": [
+        "synthetic_training_data",
+        "csv",
+        "dfir",
+        "osint",
+        "hybrid"
+      ],
+      "use": [
+        "first_investigation",
+        "academy",
+        "ci_regression",
+        "colab"
+      ],
+      "tracks": [
+        "DFIR",
+        "OSINT",
+        "HYBRID"
+      ],
+      "colab_fit": "excellent",
+      "redistribution": "included_in_repository",
+      "safety_note": "Fictitious names and handles; documentation IP ranges and example.org are used."
+    },
     {
       "id": "nist-cfreds",
       "name": "NIST CFReDS",

@@ -1,0 +1,9 @@
+Timestamp,Computer,Channel,EventID,User,ProcessId,Details
+2026-01-01T12:00:00Z,LAB-HYBRID-01,Security,4688,carol,6100,"Process created: powershell.exe"
+2026-01-01T12:00:05Z,LAB-HYBRID-01,Sysmon,3,carol,6100,"Network connection to 203.0.113.44:443"
+2026-01-01T12:00:12Z,LAB-HYBRID-01,ChatExport,,carol,,"Message mentioned @northbridge_lab and ops@example.org"
+2026-01-01T12:00:20Z,LAB-HYBRID-01,DNS,,carol,,"Lookup for portal.example.org returned 203.0.113.44"
+2026-01-01T12:00:40Z,LAB-HYBRID-01,System,7045,SYSTEM,6200,"Service installed: LabTelemetry"
+2026-01-01T12:01:10Z,LAB-HYBRID-01,Notes,,carol,,"Public note linked @northbridge_lab with portal.example.org as a co-occurrence only"
+2026-01-01T12:02:00Z,LAB-HYBRID-01,Security,4624,carol,,"Successful interactive logon"
+2026-01-01T12:03:00Z,LAB-HYBRID-01,Security,4634,carol,,"Logoff"

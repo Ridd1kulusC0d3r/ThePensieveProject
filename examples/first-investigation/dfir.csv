@@ -1,0 +1,7 @@
+Timestamp,Computer,Channel,EventID,User,ProcessId,Details
+2026-01-01T10:00:00Z,LAB-DFIR-01,Security,4688,alice,4100,"Process created: powershell.exe"
+2026-01-01T10:00:04Z,LAB-DFIR-01,Sysmon,1,alice,4100,"Process observed: powershell.exe parent=explorer.exe"
+2026-01-01T10:00:09Z,LAB-DFIR-01,Sysmon,3,alice,4100,"Network connection to 192.0.2.25:443"
+2026-01-01T10:00:30Z,LAB-DFIR-01,System,7045,SYSTEM,5220,"Service installed: LabUpdater"
+2026-01-01T10:01:10Z,LAB-DFIR-01,Security,4624,alice,,"Successful interactive logon"
+2026-01-01T10:03:00Z,LAB-DFIR-01,Security,4634,alice,,"Logoff"
