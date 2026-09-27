@@ -1,5 +1,6 @@
 """SQLite case database with evidence and derived layers separated."""
 import json, sqlite3
+from contextlib import closing
 from pathlib import Path
 from typing import Iterable
 from pensieve_timeline.correlation import Correlation
@@ -18,7 +19,7 @@ CREATE INDEX IF NOT EXISTS idx_entity_label ON entity_mentions(label);
 """
 def save_case(path:Path,events:Iterable[ForensicEvent],correlations:Iterable[Correlation]=(),entities:Iterable[EntityMention]=())->None:
     es,cs,ms=list(events),list(correlations),list(entities)
-    with sqlite3.connect(path) as c:
+    with closing(sqlite3.connect(path)) as c:
         c.execute("PRAGMA foreign_keys = ON");c.executescript(SCHEMA)
         c.executemany("INSERT OR REPLACE INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",[
           (e.event_id,e.timestamp.isoformat(),e.source,e.artifact_type,e.event_type,e.host,e.user,e.provider,e.event_code,e.pid,e.message,e.risk_score,json.dumps(e.tags,ensure_ascii=False),e.source_path,e.record_locator,e.parser,e.parser_version,e.time_assumption,json.dumps(e.raw,ensure_ascii=False,default=str)) for e in es])
