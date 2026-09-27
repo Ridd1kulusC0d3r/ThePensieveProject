@@ -17,7 +17,9 @@ The Pensieve Project turns heterogeneous forensic evidence into a canonical time
 - deterministic IOC/entity extraction before ML;
 - canonical entity normalization, evidence hashes and multi-extractor deduplication;
 - optional multilingual GLiNER zero-shot NER grounded to source-text offsets;
-- optional local Qwen analysis over an evidence packet, not raw case data;
+- Evidence Packet v2 with per-event and packet SHA-256 integrity;
+- optional local Qwen reasoning with mandatory `event_id` citations and fail-closed validation;
+- transparent calibrated support that never treats model confidence as probability;
 - Google Colab path for labs and demonstrations;
 - Academy for first-time investigators and machine-readable guidance for AI tutors.
 
@@ -76,12 +78,23 @@ For EVTX, Registry or disk-image ingestion, explicitly enable the LAB registry a
 pensieve-timeline ingest sample.evtx --extended-parsers -o timeline.jsonl
 ```
 
-Qwen is also opt-in and receives a bounded Evidence Packet with event IDs:
+Qwen is also opt-in. Audit the exact model input first:
 
 ```bash
-pensieve-timeline llm-summary timeline.jsonl entities.jsonl \
-  --model Qwen/Qwen3-0.6B -o intelligence.json
+pensieve-timeline evidence-packet timeline.jsonl \
+  --entities entities.jsonl -o evidence-packet.json
 ```
+
+Then run evidence-bounded reasoning:
+
+```bash
+pensieve-timeline reason timeline.jsonl entities.jsonl \
+  --model Qwen/Qwen3-0.6B \
+  --packet-output evidence-packet.json \
+  -o intelligence.json
+```
+
+Every claim must cite valid `event_id` values from the packet. Hypotheses require alternatives, and model self-confidence is stored separately from Pensieve's structural support calibration.
 
 ## Google Colab
 
@@ -110,7 +123,13 @@ Canonical ForensicEvent  ---> hash/provenance
           EntityMention ---> co-occurrence graph
                |
                v
-         Evidence Packet ---> optional local Qwen
+      Evidence Packet v2 ---> optional local Qwen
+               |                     |
+               |                     v
+               +------------> strict citation validator
+                                      |
+                                      v
+                             calibrated AI report
 ```
 
 OSINT-derived data lives separately from the canonical event table so models can be re-run without mutating evidence. Equivalent regex/GLiNER detections are deduplicated while preserving extractor provenance.
@@ -119,7 +138,7 @@ OSINT-derived data lives separately from the canonical event table so models can
 
 Core tests run on Linux, Windows and macOS. Heavy forensic backends are classified as LAB capabilities and their integration workflows are manual-only until representative fixtures and cross-tool comparisons are stable. See [`docs/CAPABILITY_MATRIX.md`](docs/CAPABILITY_MATRIX.md).
 
-Local v0.3 development validation before publication: **19 tests passed** and the synthetic end-to-end lab produced 3 events, 6 entity mentions, a 6-node/4-edge graph, SQLite case data and a standalone HTML report.
+CI is the validation authority for the current branch. Core, OSINT and AI-reasoning contracts are tested without requiring model downloads; heavyweight model/backend integrations remain optional.
 
 ## Datasets and references
 
@@ -131,4 +150,14 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev2**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev3**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+
+
+## AI reasoning contracts
+
+Machine-readable contracts are published in:
+
+- `schemas/evidence-packet-v2.schema.json`
+- `schemas/ai-reasoning-payload-v2.schema.json`
+
+See `docs/ai-reasoning.md` for the evidence immutability and confidence-calibration model.
