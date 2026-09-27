@@ -1,27 +1,20 @@
-name: EVTX real-corpus regression
+name: Forensic LAB — EVTX
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 4 * * 1"
-  pull_request:
-    paths:
-      - "src/pensieve_timeline/parsers/evtx.py"
-      - "src/pensieve_timeline/parsers/__init__.py"
-      - "src/pensieve_timeline/cli.py"
-      - "src/pensieve_timeline/model.py"
-      - "pyproject.toml"
-      - ".github/workflows/integration-evtx.yml"
 
 permissions:
   contents: read
 
 jobs:
   real-evtx:
+    name: Validate pinned EVTX corpus
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v7
+
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
@@ -35,52 +28,135 @@ jobs:
         run: |
           set -euo pipefail
           FIXTURE_COMMIT="93109ec7542e1cdce598ffc7817bb149b88c4340"
-          curl -fL --retry 3 --retry-all-errors             -o sample.evtx             "https://raw.githubusercontent.com/sbousseaden/EVTX-ATTACK-SAMPLES/${FIXTURE_COMMIT}/UACME_59_Sysmon.evtx"
+          FIXTURE_URL="https://raw.githubusercontent.com/sbousseaden/EVTX-ATTACK-SAMPLES/${FIXTURE_COMMIT}/UACME_59_Sysmon.evtx"
+
+          curl -fL --retry 3 --retry-all-errors             -o sample.evtx             "${FIXTURE_URL}"
+
           python - <<'PY'
           from hashlib import sha256
           import os
           from pathlib import Path
+
           path = Path("sample.evtx")
           digest = sha256(path.read_bytes()).hexdigest()
-          expected = "1de3775180143fd5d956bae48f572367534ae8c10f6ffbe98dd4b4e0e47e0fa1"
-          assert path.stat().st_size == 69632, f"unexpected fixture size: {path.stat().st_size}"
-          assert digest == expected, f"fixture digest drift: {digest}"
+
+          expected_digest = "1de3775180143fd5d956bae48f572367534ae8c10f6ffbe98dd4b4e0e47e0fa1"
+          expected_size = 69632
+
+          assert path.stat().st_size == expected_size, (
+              f"unexpected fixture size: {path.stat().st_size}"
+          )
+          assert digest == expected_digest, (
+              f"fixture digest drift: {digest}"
+          )
+
           print(f"fixture_bytes={path.stat().st_size}")
           print(f"fixture_sha256={digest}")
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
-              handle.write(f"### EVTX fixture\\n- bytes: {path.stat().st_size}\\n- sha256: `{digest}`\\n")
+
+          with open(
+              os.environ["GITHUB_STEP_SUMMARY"],
+              "a",
+              encoding="utf-8",
+          ) as handle:
+              handle.write(
+                  "### EVTX fixture\n"
+                  f"- bytes: {path.stat().st_size}\n"
+                  f"- sha256: `{digest}`\n"
+                  "- source: pinned EVTX-ATTACK-SAMPLES commit\n"
+              )
           PY
 
-      - name: Parse through the gated Pensieve registry
-        run: pensieve-timeline ingest sample.evtx --extended-parsers -o timeline.jsonl
+      - name: Parse through Pensieve LAB gate
+        run: |
+          pensieve-timeline ingest             sample.evtx             --extended-parsers             -o timeline.jsonl             --sqlite evtx-case.db
 
-      - name: Assert canonical provenance contract
+      - name: Assert EVTX v2 provenance contract
         shell: python
         run: |
           import json
+          import os
           from pathlib import Path
 
           rows = [
               json.loads(line)
-              for line in Path("timeline.jsonl").read_text(encoding="utf-8").splitlines()
+              for line in Path("timeline.jsonl").read_text(
+                  encoding="utf-8"
+              ).splitlines()
               if line.strip()
           ]
-          assert len(rows) == 7, f"expected 7 canonical events, got {len(rows)}"
+
+          assert len(rows) == 7, (
+              f"expected 7 canonical events, got {len(rows)}"
+          )
           assert all(row["artifact_type"] == "evtx" for row in rows)
           assert all(row["parser"] == "python-evtx" for row in rows)
+          assert all(row["parser_version"] == "2" for row in rows)
           assert all(row["event_id"] for row in rows)
           assert all(row["event_code"] for row in rows)
-          assert all(str(row["record_locator"]).startswith("event_record_id:") for row in rows)
-          assert all(str(row["source_path"]).endswith("sample.evtx") for row in rows)
+          assert all(row["provider"] for row in rows)
+          assert all(
+              str(row["record_locator"]).startswith(
+                  "event_record_id:"
+              )
+              for row in rows
+          )
+          assert all(
+              str(row["source_path"]).endswith("sample.evtx")
+              for row in rows
+          )
+          assert all(
+              len(row["raw"]["xml_sha256"]) == 64
+              for row in rows
+          )
+          assert all(
+              "system" in row["raw"]
+              for row in rows
+          )
 
-          event_codes = sorted({row["event_code"] for row in rows})
-          assert event_codes == ["1", "10"], f"unexpected Event IDs: {event_codes}"
-          print(f"validated_events={len(rows)}")
-          print(f"event_codes={event_codes}")
-          import os
-          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+          event_codes = sorted(
+              {row["event_code"] for row in rows}
+          )
+          providers = sorted(
+              {row["provider"] for row in rows}
+          )
+
+          assert event_codes == ["1", "10"], (
+              f"unexpected Event IDs: {event_codes}"
+          )
+          assert "Microsoft-Windows-Sysmon" in providers
+
+          sysmon_one = [
+              row
+              for row in rows
+              if row["event_code"] == "1"
+              and row["provider"] == "Microsoft-Windows-Sysmon"
+          ]
+          assert sysmon_one
+          assert all(
+              "sysmon-process-create" in row["tags"]
+              for row in sysmon_one
+          )
+
+          with open(
+              os.environ["GITHUB_STEP_SUMMARY"],
+              "a",
+              encoding="utf-8",
+          ) as handle:
               handle.write(
+                  "### Pensieve EVTX result\n"
                   f"- canonical events: **{len(rows)}**\n"
                   f"- event codes: `{event_codes}`\n"
-                  "- gate: `--extended-parsers` exercised successfully\n"
+                  f"- providers: `{providers}`\n"
+                  "- parser contract: `python-evtx/v2`\n"
+                  "- gate: `--extended-parsers`\n"
               )
+
+      - name: Upload normalized LAB outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: pensieve-evtx-lab-output
+          path: |
+            timeline.jsonl
+            evtx-case.db
+          if-no-files-found: error
+          retention-days: 7
