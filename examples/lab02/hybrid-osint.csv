@@ -1,0 +1,4 @@
+Timestamp,Computer,Channel,EventID,User,ProcessId,Details
+2026-01-01T10:00:00Z,LAB-01,Security,4688,alice,4242,"powershell.exe contacted 10.10.10.5 and referenced https://example.org/payload"
+2026-01-01T10:00:05Z,LAB-01,ChatExport,,alice,,"Analyst note: contact ops@example.org and handle @blue_team"
+2026-01-01T10:01:00Z,LAB-01,Sysmon,1,alice,4242,"Process execution related to example.org"
