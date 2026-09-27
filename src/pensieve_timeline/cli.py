@@ -9,7 +9,7 @@ from pensieve_timeline.integrity import fingerprint
 from pensieve_timeline.io import read_entities, read_jsonl, write_csv, write_entities, write_jsonl, write_timesketch_jsonl
 from pensieve_timeline.knowledge import index_artifacts
 from pensieve_timeline.osint.extract import DEFAULT_GLINER_LABELS, extract_entities
-from pensieve_timeline.osint.graph import build_entity_graph
+from pensieve_timeline.osint.graph import build_entity_graph, build_evidence_graph
 from pensieve_timeline.osint.llm import build_evidence_packet, summarize_with_qwen
 from pensieve_timeline.pipeline import ingest
 from pensieve_timeline.report import build_html
@@ -24,7 +24,7 @@ def _build_parser():
     x=c.add_parser("ingest"); x.add_argument("inputs",type=Path,nargs="+"); x.add_argument("-o","--output",type=Path,default=Path("timeline.jsonl")); x.add_argument("--csv",type=Path); x.add_argument("--sqlite",type=Path); x.add_argument("--timesketch",type=Path); x.add_argument("--correlate-window",type=int,default=120)
     x=c.add_parser("correlate"); x.add_argument("timeline",type=Path); x.add_argument("-o","--output",type=Path,default=Path("correlations.jsonl")); x.add_argument("--window",type=int,default=120); x.add_argument("--min-score",type=int,default=4)
     x=c.add_parser("entities"); x.add_argument("timeline",type=Path); x.add_argument("-o","--output",type=Path,default=Path("entities.jsonl")); x.add_argument("--gliner",action="store_true"); x.add_argument("--model",default="urchade/gliner_multi-v2.1"); x.add_argument("--threshold",type=float,default=.45); x.add_argument("--labels",nargs="*",default=None); x.add_argument("--include-raw",action="store_true"); x.add_argument("--sqlite",type=Path)
-    x=c.add_parser("graph"); x.add_argument("entities",type=Path); x.add_argument("-o","--output",type=Path,default=Path("entity-graph.json"))
+    x=c.add_parser("graph"); x.add_argument("entities",type=Path); x.add_argument("-o","--output",type=Path,default=Path("entity-graph.json"))\n    x=c.add_parser("evidence-graph"); x.add_argument("timeline",type=Path); x.add_argument("entities",type=Path); x.add_argument("-o","--output",type=Path,default=Path("evidence-graph.json")); x.add_argument("--window",type=int,default=120)
     x=c.add_parser("analyze"); x.add_argument("timeline",type=Path); x.add_argument("-o","--output",type=Path,default=Path("analysis.jsonl")); x.add_argument("--method",choices=["rarity","isolation-forest"],default="rarity")
     x=c.add_parser("llm-summary"); x.add_argument("timeline",type=Path); x.add_argument("entities",type=Path); x.add_argument("-o","--output",type=Path,default=Path("intelligence.json")); x.add_argument("--model",default="Qwen/Qwen3-0.6B"); x.add_argument("--max-events",type=int,default=40)
     x=c.add_parser("artifacts-index"); x.add_argument("path",type=Path); x.add_argument("-o","--output",type=Path,default=Path("artifact-index.json"))
@@ -56,7 +56,7 @@ def main(argv=None):
             print(json.dumps({"ok":True,"entities":len(mentions),"gliner":a.gliner,"output":str(a.output)},indent=2)); return 0
         if a.command=="graph":
             graph=build_entity_graph(read_entities(a.entities)); a.output.write_text(json.dumps(graph,ensure_ascii=False,indent=2),encoding="utf-8"); print(json.dumps({"ok":True,"nodes":len(graph["nodes"]),"edges":len(graph["edges"]),"output":str(a.output)},indent=2)); return 0
-        if a.command=="analyze":
+        if a.command=="evidence-graph":\n            events=read_jsonl(a.timeline); mentions=read_entities(a.entities); graph=build_evidence_graph(events,mentions,correlate(events,window_seconds=a.window)); a.output.write_text(json.dumps(graph,ensure_ascii=False,indent=2),encoding="utf-8"); print(json.dumps({"ok":True,"nodes":len(graph["nodes"]),"edges":len(graph["edges"]),"output":str(a.output)},indent=2)); return 0\n        if a.command=="analyze":
             events=read_jsonl(a.timeline); findings=rarity_analysis(events) if a.method=="rarity" else isolation_forest_analysis(events); _write_rows(a.output,[x.to_dict() for x in findings]); print(json.dumps({"ok":True,"method":a.method,"findings":len(findings)},indent=2)); return 0
         if a.command=="llm-summary":
             packet=build_evidence_packet(read_jsonl(a.timeline),read_entities(a.entities),max_events=a.max_events); result=summarize_with_qwen(packet,model_name=a.model); a.output.write_text(json.dumps(result,ensure_ascii=False,indent=2),encoding="utf-8"); print(json.dumps({"ok":True,"model":a.model,"output":str(a.output)},indent=2)); return 0
