@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ridd1kulusc0d3r.github.io/ThePensieveProject/schemas/evidence-packet-v2.schema.json",
+  "title": "Pensieve Evidence Packet v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packet_id",
+    "packet_sha256",
+    "schema_version",
+    "policy",
+    "selection",
+    "events"
+  ],
+  "properties": {
+    "packet_id": {
+      "type": "string",
+      "pattern": "^ep2:[a-f0-9]{24}$"
+    },
+    "packet_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "schema_version": {
+      "const": "2.0"
+    },
+    "policy": {
+      "type": "object"
+    },
+    "selection": {
+      "type": "object"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event_id",
+          "timestamp",
+          "source",
+          "artifact_type",
+          "message",
+          "provenance",
+          "entities",
+          "event_digest"
+        ],
+        "properties": {
+          "event_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "artifact_type": {
+            "type": "string"
+          },
+          "event_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "host": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "user": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "event_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "pid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "risk_score": {
+            "type": "integer"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provenance": {
+            "type": "object"
+          },
+          "entities": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "event_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  }
+}

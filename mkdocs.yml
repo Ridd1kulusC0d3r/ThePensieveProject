@@ -25,6 +25,7 @@ markdown_extensions:
 nav:
   - Comece aqui: index.md
   - OSINT híbrido: osint-hybrid.md
+  - AI Reasoning: ai-reasoning.md
   - Academy:
       - Visão geral: academy/index.md
       - Missão 3 — OSINT híbrido: academy/mission-03-osint.md
