@@ -1,0 +1,17 @@
+{
+  "name": "Pensieve DFIR + OSINT Academy",
+  "version": "0.3",
+  "epistemic_contract": [
+    "Never turn an extracted entity into a verified identity without independent evidence.",
+    "Every observation must cite event_id values.",
+    "Separate observation, inference and hypothesis.",
+    "State uncertainty and at least one plausible alternative for inferential claims.",
+    "Do not send raw case evidence to external services by default."
+  ],
+  "machine_readable_assets": [
+    "schemas/forensic-event.schema.json",
+    "schemas/entity-mention.schema.json",
+    "schemas/investigative-finding.schema.json",
+    "datasets/catalog.json"
+  ]
+}
