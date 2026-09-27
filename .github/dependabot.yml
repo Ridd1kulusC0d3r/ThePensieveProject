@@ -1,0 +1,36 @@
+version: 2
+
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 6
+    groups:
+      lightweight-tooling:
+        dependency-type: development
+      optional-forensic-backends:
+        patterns:
+          - "python-evtx"
+          - "regipy"
+          - "dissect.target"
+          - "PyYAML"
+          - "scikit-learn"
+      optional-ai-backends:
+        patterns:
+          - "gliner"
+          - "transformers"
+          - "torch"
+          - "accelerate"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+      day: monday
+      time: "07:30"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
