@@ -1,0 +1,60 @@
+name: Bootstrap Pensieve v0.3
+
+on:
+  push:
+    branches:
+      - "feat/v0.3-dfir-osint-academy"
+    paths:
+      - ".bootstrap/**"
+      - ".github/workflows/bootstrap.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expand:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/v0.3-dfir-osint-academy
+          fetch-depth: 0
+
+      - name: Rebuild and verify staged source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat \
+            .bootstrap/part00 .bootstrap/part01 .bootstrap/part02 .bootstrap/part03 \
+            .bootstrap/part04 .bootstrap/part05 .bootstrap/part06 .bootstrap/part07 \
+            .bootstrap/part08 .bootstrap/part09 .bootstrap/part10 \
+            .bootstrap/part11a .bootstrap/part11b .bootstrap/part12 .bootstrap/part13 \
+            > /tmp/pensieve-stage.b64
+          test "$(wc -c < /tmp/pensieve-stage.b64 | tr -d ' ')" = "91896"
+          base64 --decode /tmp/pensieve-stage.b64 > /tmp/pensieve-stage.tar.gz
+          echo "12679c201ada406b3c1c1994d4f3ef51175dc7661a55e8ffa6d962f603d798a6  /tmp/pensieve-stage.tar.gz" | sha256sum --check
+          tar -xzf /tmp/pensieve-stage.tar.gz
+
+      - name: Remove bootstrap transport
+        shell: bash
+        run: |
+          rm -rf .bootstrap
+          rm -f .github/workflows/bootstrap.yml
+          rm -f thepensieveproject.md
+
+      - name: Commit project tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "feat: bootstrap Pensieve v0.3 DFIR OSINT Academy"
+          git push origin HEAD:feat/v0.3-dfir-osint-academy
