@@ -1,74 +1,265 @@
 {
-  "format_version": "1.1",
+  "format_version": "2.0",
   "course": "Pensieve DFIR + OSINT Academy",
+  "entrypoint": "colab/first_investigation.ipynb",
+  "pedagogy": {
+    "unit": "mission",
+    "target_minutes_per_mission": "8-15",
+    "cycle": [
+      "observe",
+      "preserve",
+      "normalize",
+      "question",
+      "correlate",
+      "test_hypothesis",
+      "record_limits"
+    ],
+    "learner_rule": "Do not advance because a command ran; advance when you can explain what the output means and what it does not prove."
+  },
   "audiences": [
     "first_forensic",
     "dfir_student",
+    "osint_student",
     "analyst",
     "ai_tutor"
   ],
-  "principles": [
-    "evidence_before_conclusion",
-    "preserve_provenance",
-    "separate_observation_inference_and_hypothesis",
-    "make_time_assumptions_explicit",
-    "correlation_must_explain_why"
-  ],
-  "missions": [
+  "shared_core": [
     {
-      "id": "M01",
+      "id": "C00",
+      "title": "Orientação e contrato epistemológico",
+      "minutes": 8,
+      "outcomes": [
+        "distinguish evidence from interpretation",
+        "understand track choices",
+        "recognize synthetic lab boundaries"
+      ],
+      "checkpoint": "Explain why a tool output is not automatically a conclusion."
+    },
+    {
+      "id": "C01",
       "title": "Preservar antes de interpretar",
+      "minutes": 10,
+      "prerequisites": [
+        "C00"
+      ],
       "outcomes": [
-        "hash evidence",
-        "diagnose environment",
-        "understand chain-of-custody boundaries"
-      ]
+        "run doctor",
+        "hash an input",
+        "identify provenance boundaries"
+      ],
+      "commands": [
+        "pensieve-timeline doctor",
+        "pensieve-timeline hash <dataset>"
+      ],
+      "checkpoint": "Record the SHA-256 before analysis and explain what hashing proves and does not prove."
     },
     {
-      "id": "M02",
-      "title": "Transformar logs em eventos forenses",
+      "id": "C02",
+      "title": "Criar a primeira timeline",
+      "minutes": 12,
       "prerequisites": [
-        "M01"
+        "C01"
       ],
       "outcomes": [
-        "ingest CSV/JSONL",
-        "understand canonical event fields",
-        "identify provenance and time assumptions"
-      ]
-    },
-    {
-      "id": "M03",
-      "title": "Extrair entidades sem inventar vínculos",
-      "prerequisites": [
-        "M02"
+        "ingest CSV",
+        "read ForensicEvent fields",
+        "identify time assumptions"
       ],
-      "outcomes": [
-        "extract deterministic indicators",
-        "use GLiNER optionally",
-        "build co-occurrence graph",
-        "build evidence packet"
+      "commands": [
+        "pensieve-timeline ingest <dataset> -o timeline.jsonl --sqlite case.db"
       ],
-      "lab": "examples/lab02/hybrid-osint.csv"
-    },
-    {
-      "id": "M04",
-      "title": "Correlacionar e formular hipóteses",
-      "prerequisites": [
-        "M03"
-      ],
-      "outcomes": [
-        "use temporal windows",
-        "cite event IDs",
-        "separate observation inference hypothesis"
-      ]
+      "checkpoint": "Find one event_id and trace it back to source, timestamp and record locator."
     }
   ],
+  "tracks": {
+    "DFIR": {
+      "dataset": "examples/first-investigation/dfir.csv",
+      "missions": [
+        {
+          "id": "D01",
+          "title": "Triage sem veredito",
+          "minutes": 10,
+          "prerequisites": [
+            "C02"
+          ],
+          "outcomes": [
+            "inspect risk scores",
+            "separate prioritization from maliciousness"
+          ],
+          "checkpoint": "Identify the highest-priority event and state one benign alternative explanation."
+        },
+        {
+          "id": "D02",
+          "title": "Correlação temporal explicável",
+          "minutes": 12,
+          "prerequisites": [
+            "D01"
+          ],
+          "commands": [
+            "pensieve-timeline correlate timeline.jsonl -o correlations.jsonl --window 120"
+          ],
+          "outcomes": [
+            "interpret same_host same_user same_pid and time-window reasons",
+            "avoid causal claims"
+          ],
+          "checkpoint": "Choose one correlation and list the exact rules that created it."
+        },
+        {
+          "id": "D03",
+          "title": "Hipótese forense concorrente",
+          "minutes": 15,
+          "prerequisites": [
+            "D02"
+          ],
+          "outcomes": [
+            "cite event_ids",
+            "write observation inference hypothesis",
+            "create alternative explanation"
+          ],
+          "checkpoint": "Produce one hypothesis with at least two cited events and one plausible alternative."
+        }
+      ]
+    },
+    "OSINT": {
+      "dataset": "examples/first-investigation/osint.csv",
+      "missions": [
+        {
+          "id": "O01",
+          "title": "Extrair sem inventar",
+          "minutes": 10,
+          "prerequisites": [
+            "C02"
+          ],
+          "commands": [
+            "pensieve-timeline entities timeline.jsonl -o entities.jsonl"
+          ],
+          "outcomes": [
+            "extract deterministic indicators",
+            "inspect offsets evidence_hash and normalized_value"
+          ],
+          "checkpoint": "Explain the difference between observed text, normalized entity and verified identity."
+        },
+        {
+          "id": "O02",
+          "title": "Grafo de coocorrência",
+          "minutes": 12,
+          "prerequisites": [
+            "O01"
+          ],
+          "commands": [
+            "pensieve-timeline graph entities.jsonl -o entity-graph.json"
+          ],
+          "outcomes": [
+            "read entity nodes",
+            "interpret co_occurrence",
+            "avoid ownership or identity inference"
+          ],
+          "checkpoint": "Find one graph edge and describe only what the edge proves."
+        },
+        {
+          "id": "O03",
+          "title": "GLiNER opcional e corroborado",
+          "minutes": 15,
+          "prerequisites": [
+            "O02"
+          ],
+          "optional": true,
+          "outcomes": [
+            "run zero-shot NER locally",
+            "compare deterministic and model extractors",
+            "understand corroborated_by"
+          ],
+          "checkpoint": "Find or explain a case where two extractors can support the same mention without proving identity."
+        }
+      ]
+    },
+    "HYBRID": {
+      "label": "DFIR + OSINT",
+      "dataset": "examples/first-investigation/hybrid.csv",
+      "missions": [
+        {
+          "id": "H01",
+          "title": "Unificar host e contexto aberto",
+          "minutes": 12,
+          "prerequisites": [
+            "C02"
+          ],
+          "commands": [
+            "pensieve-timeline entities timeline.jsonl -o entities.jsonl",
+            "pensieve-timeline evidence-graph timeline.jsonl entities.jsonl -o evidence-graph.json"
+          ],
+          "outcomes": [
+            "keep event and entity nodes distinct",
+            "combine temporal correlation with grounded mentions"
+          ],
+          "checkpoint": "Identify one host event and one entity mention that share context without claiming causality."
+        },
+        {
+          "id": "H02",
+          "title": "Evidence Packet v2",
+          "minutes": 12,
+          "prerequisites": [
+            "H01"
+          ],
+          "commands": [
+            "pensieve-timeline evidence-packet timeline.jsonl --entities entities.jsonl -o evidence-packet.json"
+          ],
+          "outcomes": [
+            "audit model input",
+            "verify packet hash",
+            "confirm raw and source_path exclusion"
+          ],
+          "checkpoint": "List three fields deliberately excluded from the AI boundary or explain why exclusion matters."
+        },
+        {
+          "id": "H03",
+          "title": "Raciocínio assistido e auditável",
+          "minutes": 15,
+          "prerequisites": [
+            "H02"
+          ],
+          "optional": true,
+          "outcomes": [
+            "run local Qwen",
+            "validate event_id citations",
+            "distinguish reported confidence from calibrated support"
+          ],
+          "checkpoint": "Review one claim and verify every cited event_id manually."
+        },
+        {
+          "id": "H04",
+          "title": "Capstone: relatório de primeira investigação",
+          "minutes": 20,
+          "prerequisites": [
+            "H02"
+          ],
+          "outcomes": [
+            "produce evidence-backed observations",
+            "state uncertainty",
+            "recommend next evidence collection"
+          ],
+          "checkpoint": "Deliver a concise case note with observations, one inference, one hypothesis, one alternative and next question."
+        }
+      ]
+    }
+  },
+  "completion": {
+    "minimum_core": [
+      "C00",
+      "C01",
+      "C02"
+    ],
+    "track_rule": "Complete all non-optional missions in one track.",
+    "academy_rule": "A learner is complete when they can defend provenance, citations, uncertainty and the limits of correlation."
+  },
   "ai_contract": {
+    "answer_mode": "coach_then_verify",
     "never_hide_uncertainty": true,
     "never_call_correlation_causation": true,
     "cite_event_ids_in_conclusions": true,
-    "prefer_questions_before_verdicts": true,
     "never_equate_entity_with_identity": true,
+    "do_not_invent_missing_output": true,
+    "ask_learner_to_interpret_before_revealing_capstone_reasoning": true,
     "external_enrichment_default": false,
     "raw_case_to_llm_default": false
   }
