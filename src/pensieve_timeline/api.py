@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 from typing import Any
@@ -50,7 +51,7 @@ def _rows(
     offset = max(0, int(offset))
     filters = {k: v for k, v in (filters or {}).items() if v not in (None, "")}
 
-    with _connect_readonly(path) as connection:
+    with closing(_connect_readonly(path)) as connection:
         if not _table_exists(connection, table):
             return []
         columns = {row["name"] for row in connection.execute(f"PRAGMA table_info({table})")}
@@ -78,7 +79,7 @@ def _rows(
 
 def _stats(path: Path) -> dict[str, int]:
     result: dict[str, int] = {}
-    with _connect_readonly(path) as connection:
+    with closing(_connect_readonly(path)) as connection:
         for table in PUBLIC_TABLES:
             if _table_exists(connection, table):
                 result[table] = int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
