@@ -46,7 +46,7 @@ def _build_parser():
     cmd.add_argument("--csv", type=Path)
     cmd.add_argument("--sqlite", type=Path)
     cmd.add_argument("--timesketch", type=Path)
-    cmd.add_argument("--correlate-window", type=int, default=120)
+    cmd.add_argument("--correlate-window", type=int, default=120)\n    cmd.add_argument("--extended-parsers", action="store_true", help="Enable LAB parsers: EVTX, Registry and Dissect targets")
 
     cmd = commands.add_parser("correlate")
     cmd.add_argument("timeline", type=Path)
@@ -118,7 +118,7 @@ def main(argv=None):
             return 0
 
         if args.command == "ingest":
-            events = ingest(args.inputs)
+            events = ingest(args.inputs, include_optional=args.extended_parsers)
             write_jsonl(events, args.output)
             links = correlate(events, window_seconds=args.correlate_window)
             if args.csv:

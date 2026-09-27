@@ -69,6 +69,14 @@ class CoreTests(unittest.TestCase):
             self.assertIn("The Pensieve Project",text)
             self.assertIn("Process created",text)
 
+    def test_optional_parser_gate(self):
+        from pensieve_timeline.parsers import default_registry, extended_registry
+
+        fake = Path("sample.evtx")
+        with self.assertRaises(ValueError):
+            default_registry().resolve(fake)
+        self.assertEqual(extended_registry().resolve(fake).name, "python-evtx")
+
     def test_errors(self):
         with tempfile.TemporaryDirectory() as folder:
             self.assertEqual(self.run_cli("hash",str(Path(folder)/"missing")).returncode,2)

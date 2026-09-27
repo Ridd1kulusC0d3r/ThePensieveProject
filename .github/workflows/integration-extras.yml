@@ -1,13 +1,6 @@
 name: Optional backends smoke
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - 'pyproject.toml'
-      - 'src/pensieve_timeline/adapters/**'
-      - 'src/pensieve_timeline/parsers/registry.py'
-      - 'src/pensieve_timeline/knowledge.py'
-      - '.github/workflows/integration-extras.yml'
 permissions:
   contents: read
 jobs:
