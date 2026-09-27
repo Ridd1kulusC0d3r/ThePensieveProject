@@ -36,6 +36,7 @@
     "schemas/evidence-packet-v2.schema.json",
     "schemas/ai-reasoning-payload-v2.schema.json",
     "academy/catalog.json",
-    "datasets/catalog.json"
+    "datasets/catalog.json",
+    "schemas/academy-progress.schema.json"
   ]
 }
