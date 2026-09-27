@@ -15,7 +15,8 @@ The Pensieve Project turns heterogeneous forensic evidence into a canonical time
 - EVTX, Registry/AmCache and disk-image parsers kept behind the explicit `--extended-parsers` LAB gate;
 - explainable temporal correlation and transparent triage scores;
 - deterministic IOC/entity extraction before ML;
-- optional multilingual GLiNER zero-shot NER;
+- canonical entity normalization, evidence hashes and multi-extractor deduplication;
+- optional multilingual GLiNER zero-shot NER grounded to source-text offsets;
 - optional local Qwen analysis over an evidence packet, not raw case data;
 - Google Colab path for labs and demonstrations;
 - Academy for first-time investigators and machine-readable guidance for AI tutors.
@@ -112,7 +113,7 @@ Canonical ForensicEvent  ---> hash/provenance
          Evidence Packet ---> optional local Qwen
 ```
 
-OSINT-derived data lives separately from the canonical event table so models can be re-run without mutating evidence.
+OSINT-derived data lives separately from the canonical event table so models can be re-run without mutating evidence. Equivalent regex/GLiNER detections are deduplicated while preserving extractor provenance.
 
 ## Validation
 
@@ -130,4 +131,4 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev1**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev2**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
