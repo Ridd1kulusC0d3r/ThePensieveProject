@@ -1,7 +1,7 @@
 # The Pensieve Project
 
 [![CI](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml/badge.svg)](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/ThePensieveProject/blob/main/colab/pensieve_dfir_osint.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/ThePensieveProject/blob/main/colab/first_investigation.ipynb)
 
 
 > Cross-platform DFIR timeline, forensic reasoning and evidence-bounded OSINT in Python.
@@ -20,8 +20,8 @@ The Pensieve Project turns heterogeneous forensic evidence into a canonical time
 - Evidence Packet v2 with per-event and packet SHA-256 integrity;
 - optional local Qwen reasoning with mandatory `event_id` citations and fail-closed validation;
 - transparent calibrated support that never treats model confidence as probability;
-- Google Colab path for labs and demonstrations;
-- Academy for first-time investigators and machine-readable guidance for AI tutors.
+- Google Colab **First Investigation** with selectable DFIR, OSINT and DFIR + OSINT tracks;
+- progressive Academy missions, synthetic micro-datasets and machine-readable progress for human/AI tutors.
 
 ## Epistemic contract
 
@@ -96,9 +96,38 @@ pensieve-timeline reason timeline.jsonl entities.jsonl \
 
 Every claim must cite valid `event_id` values from the packet. Hypotheses require alternatives, and model self-confidence is stored separately from Pensieve's structural support calibration.
 
-## Google Colab
+## Google Colab — First Investigation
 
-Open `colab/pensieve_dfir_osint.ipynb` in Google Colab. The default route installs only the project core. GLiNER and Qwen are toggles in later cells so the same notebook works on free CPU sessions.
+Open `colab/first_investigation.ipynb` or use the badge at the top.
+
+Choose one track:
+
+```python
+TRACK = "DFIR"    # timeline + triage + correlation
+TRACK = "OSINT"   # entities + normalization + co-occurrence graph
+TRACK = "HYBRID"  # DFIR + OSINT + Evidence Packet v2
+```
+
+All three start with the same core: environment check, SHA-256, ingestion and provenance. GLiNER and Qwen are disabled by default so the first investigation remains usable on a normal Colab CPU runtime.
+
+The notebook produces `academy-progress.json` and a ZIP of the workspace so the investigation can be resumed or reviewed.
+
+## Academy learning paths
+
+The Academy now has a shared core plus three progressive tracks:
+
+```text
+C00 Orientation
+  ↓
+C01 Preserve + hash
+  ↓
+C02 Canonical timeline
+  ├── DFIR  → D01 triage → D02 correlation → D03 competing hypothesis
+  ├── OSINT → O01 entities → O02 graph → O03 optional GLiNER
+  └── HYBRID → H01 evidence graph → H02 packet → H03 optional Qwen → H04 capstone
+```
+
+Small synthetic datasets live in `examples/first-investigation/`. The human curriculum is under `docs/academy/`, while `academy/catalog.json` and `academy/ai-manifest.json` expose the same structure to AI tutors.
 
 ## Architecture
 
@@ -150,7 +179,7 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev3**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev4**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
 
 
 ## AI reasoning contracts
