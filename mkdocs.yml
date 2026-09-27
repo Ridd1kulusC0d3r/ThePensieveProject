@@ -28,6 +28,7 @@ nav:
   - Academy:
       - Visão geral: academy/index.md
       - Missão 3 — OSINT híbrido: academy/mission-03-osint.md
+  - API somente leitura: api.md
   - Google Colab: colab.md
   - Datasets: datasets.md
   - Validação v0.3: validation-v03.md
