@@ -1,0 +1,75 @@
+{
+  "format_version": "1.1",
+  "course": "Pensieve DFIR + OSINT Academy",
+  "audiences": [
+    "first_forensic",
+    "dfir_student",
+    "analyst",
+    "ai_tutor"
+  ],
+  "principles": [
+    "evidence_before_conclusion",
+    "preserve_provenance",
+    "separate_observation_inference_and_hypothesis",
+    "make_time_assumptions_explicit",
+    "correlation_must_explain_why"
+  ],
+  "missions": [
+    {
+      "id": "M01",
+      "title": "Preservar antes de interpretar",
+      "outcomes": [
+        "hash evidence",
+        "diagnose environment",
+        "understand chain-of-custody boundaries"
+      ]
+    },
+    {
+      "id": "M02",
+      "title": "Transformar logs em eventos forenses",
+      "prerequisites": [
+        "M01"
+      ],
+      "outcomes": [
+        "ingest CSV/JSONL",
+        "understand canonical event fields",
+        "identify provenance and time assumptions"
+      ]
+    },
+    {
+      "id": "M03",
+      "title": "Extrair entidades sem inventar vínculos",
+      "prerequisites": [
+        "M02"
+      ],
+      "outcomes": [
+        "extract deterministic indicators",
+        "use GLiNER optionally",
+        "build co-occurrence graph",
+        "build evidence packet"
+      ],
+      "lab": "examples/lab02/hybrid-osint.csv"
+    },
+    {
+      "id": "M04",
+      "title": "Correlacionar e formular hipóteses",
+      "prerequisites": [
+        "M03"
+      ],
+      "outcomes": [
+        "use temporal windows",
+        "cite event IDs",
+        "separate observation inference hypothesis"
+      ]
+    }
+  ],
+  "ai_contract": {
+    "never_hide_uncertainty": true,
+    "never_call_correlation_causation": true,
+    "cite_event_ids_in_conclusions": true,
+    "prefer_questions_before_verdicts": true,
+    "never_equate_entity_with_identity": true,
+    "external_enrichment_default": false,
+    "raw_case_to_llm_default": false
+  }
+}
