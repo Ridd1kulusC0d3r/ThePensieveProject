@@ -1,0 +1,26 @@
+name: Optional backends smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'pyproject.toml'
+      - 'src/pensieve_timeline/adapters/**'
+      - 'src/pensieve_timeline/parsers/registry.py'
+      - 'src/pensieve_timeline/knowledge.py'
+      - '.github/workflows/integration-extras.yml'
+permissions:
+  contents: read
+jobs:
+  install-extras:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        extra: [registry, knowledge, dissect]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install ".[${{ matrix.extra }}]"
+      - run: pensieve-timeline doctor

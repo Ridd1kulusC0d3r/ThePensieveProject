@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EntityMention",
+  "type": "object",
+  "required": [
+    "mention_id",
+    "event_id",
+    "text",
+    "label",
+    "start",
+    "end",
+    "score",
+    "extractor"
+  ],
+  "properties": {
+    "mention_id": {
+      "type": "string"
+    },
+    "event_id": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "start": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "end": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "extractor": {
+      "type": "string"
+    },
+    "source_field": {
+      "type": "string"
+    },
+    "context": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

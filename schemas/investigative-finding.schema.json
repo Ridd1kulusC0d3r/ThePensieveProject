@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pensieve Investigative Finding",
+  "type": "object",
+  "required": [
+    "level",
+    "statement",
+    "evidence_event_ids",
+    "rationale",
+    "confidence"
+  ],
+  "properties": {
+    "level": {
+      "enum": [
+        "observation",
+        "inference",
+        "hypothesis"
+      ]
+    },
+    "statement": {
+      "type": "string"
+    },
+    "evidence_event_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "alternatives": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}
