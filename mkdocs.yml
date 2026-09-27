@@ -28,7 +28,11 @@ nav:
   - AI Reasoning: ai-reasoning.md
   - Academy:
       - Visão geral: academy/index.md
-      - Missão 3 — OSINT híbrido: academy/mission-03-osint.md
+      - First Investigation: academy/first-investigation.md
+      - Trilha DFIR: academy/track-dfir.md
+      - Trilha OSINT: academy/track-osint.md
+      - Trilha DFIR + OSINT: academy/track-hybrid.md
+      - Missão 3 — OSINT híbrido (legado): academy/mission-03-osint.md
   - Google Colab: colab.md
   - Datasets: datasets.md
   - Validação v0.3: validation-v03.md
