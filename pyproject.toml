@@ -18,7 +18,7 @@ evtx = ["python-evtx>=0.8.1,<1"]
 registry = ["regipy>=6,<7"]
 dissect = ["dissect.target>=3,<4"]
 osint = ["gliner>=0.2"]
-llm = ["transformers>=4.51,<5", "torch>=2.6", "accelerate>=1,<2"]
+llm = ["transformers>=4.51,<6", "torch>=2.6", "accelerate>=1,<2"]
 ml = ["scikit-learn>=1.5,<2"]
 knowledge = ["PyYAML>=6,<7"]
 
