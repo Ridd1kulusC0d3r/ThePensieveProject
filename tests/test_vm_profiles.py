@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from pensieve_timeline.ops import _parser, run_forensic
+from pensieve_timeline.ops import _parser, run_ai, run_forensic
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +47,44 @@ class VMProfileTests(unittest.TestCase):
                 (case / "manifest.json").read_text(encoding="utf-8")
             )
             self.assertEqual(manifest["profile"], "forensic")
+
+    def test_ai_vm_can_consume_forensic_timeline_without_rescoring(self):
+        source = ROOT / "examples" / "first-investigation" / "dfir.csv"
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            forensic = run_forensic(
+                source,
+                workspace_root=root,
+                case_id="forensic-source",
+            )
+            timeline = Path(forensic["outputs"]["timeline_jsonl"])
+            before = [
+                json.loads(line)["risk_score"]
+                for line in timeline.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+
+            ai = run_ai(
+                timeline,
+                workspace_root=root,
+                case_id="ai-handoff",
+                canonical_timeline=True,
+                gliner_enabled=False,
+                qwen_enabled=False,
+            )
+            after_timeline = Path(ai["outputs"]["timeline_jsonl"])
+            after = [
+                json.loads(line)["risk_score"]
+                for line in after_timeline.read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+
+            self.assertEqual(ai["input_mode"], "canonical_timeline")
+            self.assertEqual(before, after)
+            self.assertTrue(
+                Path(ai["outputs"]["evidence_packet_json"]).exists()
+            )
+            self.assertIsNone(ai["outputs"]["intelligence_json"])
 
     def test_vm_bootstrap_profiles_are_explicit(self):
         forensic = (
