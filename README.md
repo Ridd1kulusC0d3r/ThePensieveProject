@@ -1,5 +1,9 @@
 # The Pensieve Project
 
+[![CI](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml/badge.svg)](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ridd1kulusC0d3r/ThePensieveProject/blob/main/colab/pensieve_dfir_osint.ipynb)
+
+
 > Cross-platform DFIR timeline, forensic reasoning and evidence-bounded OSINT in Python.
 
 The Pensieve Project turns heterogeneous forensic evidence into a canonical timeline and keeps a hard boundary between **evidence**, **correlation**, **inference** and **hypothesis**.
