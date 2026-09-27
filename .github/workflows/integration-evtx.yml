@@ -1,27 +1,86 @@
-name: EVTX integration
+name: EVTX real-corpus regression
+
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "17 4 * * 1"
+  pull_request:
+    paths:
+      - "src/pensieve_timeline/parsers/evtx.py"
+      - "src/pensieve_timeline/parsers/__init__.py"
+      - "src/pensieve_timeline/cli.py"
+      - "src/pensieve_timeline/model.py"
+      - "pyproject.toml"
+      - ".github/workflows/integration-evtx.yml"
+
 permissions:
   contents: read
+
 jobs:
   real-evtx:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
-          python-version: '3.12'
-      - run: python -m pip install '.[evtx]'
-      - name: Download public EVTX fixture
-        run: curl -fL --retry 3 -o sample.evtx https://raw.githubusercontent.com/sbousseaden/EVTX-ATTACK-SAMPLES/master/UACME_59_Sysmon.evtx
-      - run: pensieve-timeline ingest sample.evtx -o timeline.jsonl
-      - name: Assert canonical events
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install isolated EVTX capability
+        run: python -m pip install ".[evtx]"
+
+      - name: Download immutable public EVTX fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          FIXTURE_COMMIT="93109ec7542e1cdce598ffc7817bb149b88c4340"
+          curl -fL --retry 3 --retry-all-errors             -o sample.evtx             "https://raw.githubusercontent.com/sbousseaden/EVTX-ATTACK-SAMPLES/${FIXTURE_COMMIT}/UACME_59_Sysmon.evtx"
+          python - <<'PY'
+          from hashlib import sha256
+          import os
+          from pathlib import Path
+          path = Path("sample.evtx")
+          digest = sha256(path.read_bytes()).hexdigest()
+          expected = "1de3775180143fd5d956bae48f572367534ae8c10f6ffbe98dd4b4e0e47e0fa1"
+          assert path.stat().st_size == 69632, f"unexpected fixture size: {path.stat().st_size}"
+          assert digest == expected, f"fixture digest drift: {digest}"
+          print(f"fixture_bytes={path.stat().st_size}")
+          print(f"fixture_sha256={digest}")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write(f"### EVTX fixture\\n- bytes: {path.stat().st_size}\\n- sha256: `{digest}`\\n")
+          PY
+
+      - name: Parse through the gated Pensieve registry
+        run: pensieve-timeline ingest sample.evtx --extended-parsers -o timeline.jsonl
+
+      - name: Assert canonical provenance contract
         shell: python
         run: |
           import json
           from pathlib import Path
-          rows=[json.loads(line) for line in Path("timeline.jsonl").read_text().splitlines() if line.strip()]
-          assert rows, "EVTX parser emitted zero events"
-          assert all(row["artifact_type"]=="evtx" for row in rows)
+
+          rows = [
+              json.loads(line)
+              for line in Path("timeline.jsonl").read_text(encoding="utf-8").splitlines()
+              if line.strip()
+          ]
+          assert len(rows) == 7, f"expected 7 canonical events, got {len(rows)}"
+          assert all(row["artifact_type"] == "evtx" for row in rows)
+          assert all(row["parser"] == "python-evtx" for row in rows)
           assert all(row["event_id"] for row in rows)
-          print(f"validated {len(rows)} EVTX events")
+          assert all(row["event_code"] for row in rows)
+          assert all(str(row["record_locator"]).startswith("event_record_id:") for row in rows)
+          assert all(str(row["source_path"]).endswith("sample.evtx") for row in rows)
+
+          event_codes = sorted({row["event_code"] for row in rows})
+          assert event_codes == ["1", "10"], f"unexpected Event IDs: {event_codes}"
+          print(f"validated_events={len(rows)}")
+          print(f"event_codes={event_codes}")
+          import os
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
+              handle.write(
+                  f"- canonical events: **{len(rows)}**\n"
+                  f"- event codes: `{event_codes}`\n"
+                  "- gate: `--extended-parsers` exercised successfully\n"
+              )
