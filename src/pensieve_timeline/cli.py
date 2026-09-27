@@ -80,12 +80,21 @@ def _build_parser():
     cmd.add_argument("-o", "--output", type=Path, default=Path("analysis.jsonl"))
     cmd.add_argument("--method", choices=["rarity", "isolation-forest"], default="rarity")
 
-    cmd = commands.add_parser("llm-summary")
+    cmd = commands.add_parser("evidence-packet")
+    cmd.add_argument("timeline", type=Path)
+    cmd.add_argument("--entities", type=Path)
+    cmd.add_argument("-o", "--output", type=Path, default=Path("evidence-packet.json"))
+    cmd.add_argument("--max-events", type=int, default=40)
+    cmd.add_argument("--max-message-chars", type=int, default=700)
+
+    cmd = commands.add_parser("reason", aliases=["llm-summary"])
     cmd.add_argument("timeline", type=Path)
     cmd.add_argument("entities", type=Path)
     cmd.add_argument("-o", "--output", type=Path, default=Path("intelligence.json"))
+    cmd.add_argument("--packet-output", type=Path)
     cmd.add_argument("--model", default="Qwen/Qwen3-0.6B")
     cmd.add_argument("--max-events", type=int, default=40)
+    cmd.add_argument("--max-message-chars", type=int, default=700)
 
     cmd = commands.add_parser("artifacts-index")
     cmd.add_argument("path", type=Path)
@@ -175,11 +184,63 @@ def main(argv=None):
             print(json.dumps({"ok": True, "method": args.method, "findings": len(findings)}, indent=2))
             return 0
 
-        if args.command == "llm-summary":
-            packet = build_evidence_packet(read_jsonl(args.timeline), read_entities(args.entities), max_events=args.max_events)
+        if args.command == "evidence-packet":
+            events = read_jsonl(args.timeline)
+            mentions = read_entities(args.entities) if args.entities else []
+            packet = build_evidence_packet(
+                events,
+                mentions,
+                max_events=args.max_events,
+                max_message_chars=args.max_message_chars,
+            )
+            args.output.write_text(
+                json.dumps(packet, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "packet_id": packet["packet_id"],
+                        "events": len(packet["events"]),
+                        "output": str(args.output),
+                    },
+                    indent=2,
+                )
+            )
+            return 0
+
+        if args.command in {"reason", "llm-summary"}:
+            events = read_jsonl(args.timeline)
+            mentions = read_entities(args.entities)
+            packet = build_evidence_packet(
+                events,
+                mentions,
+                max_events=args.max_events,
+                max_message_chars=args.max_message_chars,
+            )
+            if args.packet_output:
+                args.packet_output.write_text(
+                    json.dumps(packet, ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
             result = summarize_with_qwen(packet, model_name=args.model)
-            args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-            print(json.dumps({"ok": True, "model": args.model, "output": str(args.output)}, indent=2))
+            args.output.write_text(
+                json.dumps(result, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "model": args.model,
+                        "packet_id": packet["packet_id"],
+                        "claims": len(result.get("claims", [])),
+                        "output": str(args.output),
+                    },
+                    indent=2,
+                )
+            )
             return 0
 
         if args.command == "artifacts-index":
