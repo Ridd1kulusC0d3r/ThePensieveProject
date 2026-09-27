@@ -11,9 +11,8 @@ The Pensieve Project turns heterogeneous forensic evidence into a canonical time
 ## Why this is not just another Timeline Explorer clone
 
 - lightweight Python core: CSV, TSV, JSONL, SQLite and HTML use the standard library;
-- optional EVTX parser via `python-evtx`;
-- optional Registry/AmCache parsing via `regipy`;
-- optional E01/VMDK/VHD/VHDX/RAW and artifact extraction via Dissect Target;
+- lightweight default ingestion for CSV/TSV/JSONL;
+- EVTX, Registry/AmCache and disk-image parsers kept behind the explicit `--extended-parsers` LAB gate;
 - explainable temporal correlation and transparent triage scores;
 - deterministic IOC/entity extraction before ML;
 - optional multilingual GLiNER zero-shot NER;
@@ -40,7 +39,7 @@ python -m pip install .
 pensieve-timeline doctor
 ```
 
-Optional capabilities are independent:
+Optional capabilities are independent. Heavy forensic parsers are installed separately and are not enabled by default:
 
 ```bash
 python -m pip install '.[evtx]'
@@ -68,6 +67,12 @@ The deterministic entity layer extracts text already present in evidence. GLiNER
 pensieve-timeline entities timeline.jsonl --gliner \
   --labels person organization "phone number" email domain "social media handle" \
   -o entities-gliner.jsonl
+```
+
+For EVTX, Registry or disk-image ingestion, explicitly enable the LAB registry after installing the matching extra:
+
+```bash
+pensieve-timeline ingest sample.evtx --extended-parsers -o timeline.jsonl
 ```
 
 Qwen is also opt-in and receives a bounded Evidence Packet with event IDs:
@@ -111,7 +116,7 @@ OSINT-derived data lives separately from the canonical event table so models can
 
 ## Validation
 
-Core tests run on Linux, Windows and macOS. A separate integration workflow installs `python-evtx`, downloads a public EVTX fixture from EVTX-ATTACK-SAMPLES and requires canonical events to be emitted. Optional Registry, ForensicArtifacts and Dissect extras have installation smoke jobs.
+Core tests run on Linux, Windows and macOS. Heavy forensic backends are classified as LAB capabilities and their integration workflows are manual-only until representative fixtures and cross-tool comparisons are stable. See [`docs/CAPABILITY_MATRIX.md`](docs/CAPABILITY_MATRIX.md).
 
 Local v0.3 development validation before publication: **19 tests passed** and the synthetic end-to-end lab produced 3 events, 6 entity mentions, a 6-node/4-edge graph, SQLite case data and a standalone HTML report.
 
