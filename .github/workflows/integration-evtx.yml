@@ -65,7 +65,7 @@ jobs:
               for line in Path("timeline.jsonl").read_text(encoding="utf-8").splitlines()
               if line.strip()
           ]
-          assert rows, "EVTX parser emitted zero events"
+          assert len(rows) == 7, f"expected 7 canonical events, got {len(rows)}"
           assert all(row["artifact_type"] == "evtx" for row in rows)
           assert all(row["parser"] == "python-evtx" for row in rows)
           assert all(row["event_id"] for row in rows)
@@ -74,6 +74,7 @@ jobs:
           assert all(str(row["source_path"]).endswith("sample.evtx") for row in rows)
 
           event_codes = sorted({row["event_code"] for row in rows})
+          assert event_codes == ["1", "10"], f"unexpected Event IDs: {event_codes}"
           print(f"validated_events={len(rows)}")
           print(f"event_codes={event_codes}")
           import os
