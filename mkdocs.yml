@@ -1,0 +1,33 @@
+site_name: The Pensieve Project
+site_description: DFIR timeline, forensic reasoning and evidence-bounded OSINT in Python
+site_dir: site
+use_directory_urls: false
+repo_url: https://github.com/Ridd1kulusC0d3r/ThePensieveProject
+repo_name: Ridd1kulusC0d3r/ThePensieveProject
+theme:
+  name: material
+  language: pt-BR
+  palette:
+    scheme: slate
+    primary: black
+    accent: cyan
+  font: false
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+plugins:
+  - search
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+nav:
+  - Comece aqui: index.md
+  - OSINT híbrido: osint-hybrid.md
+  - Academy:
+      - Visão geral: academy/index.md
+      - Missão 3 — OSINT híbrido: academy/mission-03-osint.md
+  - Google Colab: colab.md
+  - Datasets: datasets.md
+  - Validação v0.3: validation-v03.md
