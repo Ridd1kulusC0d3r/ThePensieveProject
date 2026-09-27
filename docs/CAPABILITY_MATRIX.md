@@ -35,15 +35,30 @@ Requirements:
 3. distinguish extracted entity from verified identity;
 4. keep model output separate from investigator conclusions.
 
+## YELLOW / LAB — validated on a bounded corpus
+
+### EVTX via python-evtx
+
+EVTX remains behind `--extended-parsers`, but it now has a stronger validation contract:
+
+- unit tests over synthetic Windows Event XML;
+- provider-aware Sysmon scoring;
+- duplicate EventData/UserData preservation;
+- per-record XML SHA-256;
+- fail-closed malformed-record behavior;
+- a pinned real EVTX fixture validated through a **manual-only** workflow.
+
+This is still bounded validation, not a claim of universal EVTX correctness.
+
 ## RED / LAB — isolated forensic backend validation
 
-These capabilities stay behind `--extended-parsers` and manual integration workflows:
+The remaining heavy families stay isolated and will receive their own PR/workflow:
 
-- EVTX via python-evtx
-- Registry / AmCache via regipy
-- MFT / USN / Prefetch / ShimCache and disk images via Dissect
-- E01 / VMDK / VHD / VHDX / RAW
-- large public corpus downloads
+- MFT / USN via Dissect;
+- Registry / AmCache via regipy or Dissect;
+- Prefetch / ShimCache via Dissect;
+- E01 / VMDK / VHD / VHDX / RAW containers and images;
+- large public corpus campaigns.
 
 ### Alternatives
 
@@ -58,7 +73,7 @@ These capabilities stay behind `--extended-parsers` and manual integration workf
 
 ## Promotion rule
 
-A RED capability becomes YELLOW or GREEN only after:
+A RED capability becomes YELLOW, and a YELLOW capability becomes GREEN, only after progressively stronger evidence such as:
 
 1. representative public/synthetic fixtures are pinned;
 2. parsing succeeds deterministically;
