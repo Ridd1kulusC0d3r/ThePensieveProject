@@ -1,24 +1,61 @@
 # Pensieve DFIR + OSINT Academy
 
-A Academy foi desenhada para alguém executar a **primeira investigação forense do zero** sem transformar um tutorial em receita cega.
+A Academy ensina uma **primeira investigação reproduzível** antes de apresentar formatos forenses pesados. O objetivo não é decorar comandos; é aprender a distinguir evidência, correlação, inferência e hipótese.
 
-## Ciclo
+## Escolha uma trilha
 
-**Observar → Preservar → Normalizar → Perguntar → Correlacionar → Testar hipótese → Registrar limite**
+| Trilha | Para quem | Dataset | Saída principal |
+|---|---|---|---|
+| [DFIR](track-dfir.md) | primeira timeline e raciocínio forense | `dfir.csv` | timeline + correlações + hipótese |
+| [OSINT](track-osint.md) | extração e vínculo de entidades | `osint.csv` | entidades + grafo de coocorrência |
+| [DFIR + OSINT](track-hybrid.md) | investigação integrada | `hybrid.csv` | evidence graph + Evidence Packet v2 |
 
-Cada missão possui microconceito, dados reproduzíveis, comando, resultado observável, pergunta investigativa e checkpoint de evidência/inferência.
+Todas começam pelo mesmo núcleo:
 
-## Trilha
+**C00 Orientar → C01 Preservar → C02 Normalizar**
 
-- M01 — Preservar e verificar.
-- M02 — Transformar logs em `ForensicEvent`.
-- M03 — Regex + GLiNER + grafo + Evidence Packet.
-- M04 — EVTX e Event IDs.
-- M05 — Registry, AmCache e ShimCache.
-- M06 — Prefetch e evidência de execução.
-- M07 — NTFS MFT + USN Journal.
-- M08 — Imagens E01/VMDK/VHDX/RAW via backend.
-- M09 — Case Engine e hipóteses concorrentes.
-- M10 — Anomalias, CTI e interoperabilidade.
+Depois o aluno segue apenas a trilha escolhida. Nada obriga alguém estudando DFIR a baixar modelo de NER, porque sofrimento computacional não é objetivo pedagógico.
 
-O contrato para tutores de IA está em `academy/ai-manifest.json`.
+## Método
+
+Cada missão usa o mesmo ciclo:
+
+1. **Microconceito** — o que você precisa saber antes do comando.
+2. **Ação** — um comando ou pequena tarefa.
+3. **Saída observável** — o que deve aparecer.
+4. **Pergunta investigativa** — o que você consegue concluir.
+5. **Limite** — o que a saída não prova.
+6. **Checkpoint** — evidência de que você entendeu antes de avançar.
+
+O catálogo completo e machine-readable está em `academy/catalog.json`.
+
+## First Investigation
+
+O caminho recomendado é o notebook:
+
+`colab/first_investigation.ipynb`
+
+Ele possui um seletor:
+
+```python
+TRACK = "DFIR"   # ou "OSINT" / "HYBRID"
+```
+
+O notebook usa apenas datasets sintéticos pequenos por padrão. GLiNER e Qwen permanecem desativados até o aluno habilitá-los conscientemente.
+
+## Contrato epistemológico
+
+```text
+evento != interpretação
+score != veredito
+correlação != causalidade
+entidade normalizada != identidade verificada
+saída de IA != evidência
+hipótese != conclusão
+```
+
+## Para tutores de IA
+
+`academy/ai-manifest.json` define como um tutor deve ensinar as missões. Ele deve pedir que o aluno interprete a evidência e apontar os campos relevantes quando houver erro, em vez de simplesmente despejar a resposta.
+
+O progresso pode ser representado pelo schema `schemas/academy-progress.schema.json`.
