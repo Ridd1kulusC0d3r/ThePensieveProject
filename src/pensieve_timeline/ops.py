@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import asdict
 from datetime import datetime, timezone
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -133,7 +132,7 @@ def run_forensic(
         "case_id": workspace.name,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "input": evidence,
-        "input_mode": input_mode,
+        "input_mode": "evidence",
         "event_count": len(events),
         "correlation_count": len(links),
         "extended_parsers": extended_parsers,
@@ -244,6 +243,7 @@ def run_ai(
         "case_id": workspace.name,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "input": evidence,
+        "input_mode": input_mode,
         "event_count": len(events),
         "correlation_count": len(links),
         "entity_count": len(mentions),
