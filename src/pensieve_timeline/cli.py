@@ -46,7 +46,8 @@ def _build_parser():
     cmd.add_argument("--csv", type=Path)
     cmd.add_argument("--sqlite", type=Path)
     cmd.add_argument("--timesketch", type=Path)
-    cmd.add_argument("--correlate-window", type=int, default=120)\n    cmd.add_argument("--extended-parsers", action="store_true", help="Enable LAB parsers: EVTX, Registry and Dissect targets")
+    cmd.add_argument("--correlate-window", type=int, default=120)
+    cmd.add_argument("--extended-parsers", action="store_true", help="Enable LAB parsers: EVTX, Registry and Dissect targets")
 
     cmd = commands.add_parser("correlate")
     cmd.add_argument("timeline", type=Path)
