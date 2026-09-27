@@ -72,11 +72,17 @@ pensieve-timeline entities timeline.jsonl --gliner \
   -o entities-gliner.jsonl
 ```
 
-For EVTX, Registry or disk-image ingestion, explicitly enable the LAB registry after installing the matching extra:
+EVTX is the first isolated Forensic LAB family:
 
 ```bash
-pensieve-timeline ingest sample.evtx --extended-parsers -o timeline.jsonl
+python -m pip install '.[evtx]'
+pensieve-timeline ingest sample.evtx \
+  --extended-parsers \
+  -o timeline.jsonl \
+  --sqlite evtx-case.db
 ```
+
+Its real-binary regression workflow is manual-only. See `docs/forensic-lab/evtx.md`. MFT/USN, Registry, Prefetch/AmCache and forensic images remain separate future LAB families.
 
 Qwen is also opt-in. Audit the exact model input first:
 
@@ -179,7 +185,7 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev4**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev5**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
 
 
 ## AI reasoning contracts
