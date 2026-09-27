@@ -24,6 +24,7 @@ knowledge = ["PyYAML>=6,<7"]
 
 [project.scripts]
 pensieve-timeline = "pensieve_timeline.cli:main"
+pensieve-ops = "pensieve_timeline.ops:main"
 
 [project.urls]
 Repository = "https://github.com/Ridd1kulusC0d3r/ThePensieveProject"

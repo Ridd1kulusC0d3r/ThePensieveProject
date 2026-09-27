@@ -1,0 +1,10 @@
+#cloud-config
+package_update: true
+packages:
+  - git
+
+runcmd:
+  - git clone https://github.com/Ridd1kulusC0d3r/ThePensieveProject.git /root/ThePensieveProject
+  - bash /root/ThePensieveProject/deploy/vm/ai/bootstrap.sh
+
+final_message: "Pensieve AI Analyst VM provisioning complete."
