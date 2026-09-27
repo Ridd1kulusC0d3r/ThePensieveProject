@@ -96,6 +96,56 @@ pensieve-timeline reason timeline.jsonl entities.jsonl \
 
 Every claim must cite valid `event_id` values from the packet. Hypotheses require alternatives, and model self-confidence is stored separately from Pensieve's structural support calibration.
 
+## Dual-VM deployment
+
+Pensieve now ships two reference Ubuntu VM profiles:
+
+```text
+VM 1 — Forensic Core
+  raw evidence
+  timeline
+  correlation
+  SQLite
+  Timesketch export
+  HTML dashboard
+  GLiNER = not installed
+  Qwen   = not installed
+
+             timeline.jsonl
+                   |
+                   v
+
+VM 2 — AI Analyst
+  GLiNER = enabled by default
+  Qwen   = enabled by default
+  EntityMention
+  Evidence Graph
+  Evidence Packet v2
+  validated AI reasoning
+  HTML dashboard
+```
+
+Provision:
+
+```bash
+sudo bash deploy/vm/forensic/bootstrap.sh
+sudo bash deploy/vm/ai/bootstrap.sh
+```
+
+Run:
+
+```bash
+pensieve-forensic /data/evidence.csv --case-id CASE-001
+
+pensieve-ai /data/CASE-001.timeline.jsonl \
+  --canonical-timeline \
+  --case-id CASE-001-AI
+```
+
+The recommended trust boundary keeps original evidence on the forensic VM and hands only the canonical timeline to the AI VM. Both profiles serve case reports locally on `127.0.0.1:8080`.
+
+See `deploy/vm/README.md` and `docs/deployment-vms.md`.
+
 ## Google Colab — First Investigation
 
 Open `colab/first_investigation.ipynb` or use the badge at the top.
@@ -179,7 +229,7 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev4**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev6**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
 
 
 ## AI reasoning contracts
