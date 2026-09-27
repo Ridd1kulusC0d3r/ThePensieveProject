@@ -1,0 +1,76 @@
+name: Pensieve PR Auto Merge
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge explicitly authorized Pensieve PR
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            const prs = run.pull_requests || [];
+
+            if (prs.length !== 1) {
+              core.notice(`Expected exactly one PR, found ${prs.length}; skipping.`);
+              return;
+            }
+
+            const summary = prs[0];
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: summary.number,
+            });
+
+            const sameRepository =
+              pr.head.repo &&
+              pr.head.repo.full_name === `${context.repo.owner}/${context.repo.repo}`;
+
+            const allowedBranch =
+              /^(feat|fix|chore|test)\/(v0\.3-|pensieve-)/.test(pr.head.ref);
+
+            const explicitlyAuthorized =
+              pr.title.startsWith("[automerge] ");
+
+            const eligible =
+              pr.state === "open" &&
+              !pr.draft &&
+              pr.base.ref === "main" &&
+              sameRepository &&
+              allowedBranch &&
+              explicitlyAuthorized;
+
+            if (!eligible) {
+              core.notice(
+                `PR #${pr.number} is not eligible for guarded automerge.`
+              );
+              return;
+            }
+
+            const result = await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              merge_method: "squash",
+              sha: pr.head.sha,
+              commit_title: pr.title.replace(/^\[automerge\]\s*/, ""),
+            });
+
+            if (!result.data.merged) {
+              core.setFailed(
+                `GitHub refused to merge PR #${pr.number}: ${result.data.message}`
+              );
+            }
