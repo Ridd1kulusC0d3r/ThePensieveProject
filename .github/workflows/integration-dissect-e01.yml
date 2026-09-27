@@ -1,0 +1,68 @@
+name: Dissect E01 container regression
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 4 * * 2"
+  pull_request:
+    paths:
+      - "src/pensieve_timeline/adapters/dissect_target.py"
+      - "src/pensieve_timeline/parsers/__init__.py"
+      - "pyproject.toml"
+      - ".github/workflows/integration-dissect-e01.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  e01-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install isolated Dissect capability
+        run: python -m pip install ".[dissect]"
+
+      - name: Download immutable official Dissect E01 fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          FIXTURE_COMMIT="b43db371c891fa3f382c5152e16f91b0bcde418c"
+          curl -fL --retry 3 --retry-all-errors \
+            -o small.E01 \
+            "https://media.githubusercontent.com/media/fox-it/dissect.target/${FIXTURE_COMMIT}/tests/_data/containers/ewf/small.E01"
+          test "$(wc -c < small.E01 | tr -d ' ')" = "3547"
+          echo "6e387e2fa34f4bf1278269bfecea773ec973fe3e571e98fed691ad3ac423194f  small.E01" | sha256sum --check
+
+      - name: Validate EWF container and Pensieve routing
+        shell: python
+        run: |
+          from pathlib import Path
+
+          from dissect.target import container
+          from dissect.target.containers.ewf import EwfContainer
+
+          from pensieve_timeline.adapters.dissect_target import DissectTargetParser
+
+          path = Path("small.E01")
+          parser = DissectTargetParser()
+          assert parser.supports(path), "Pensieve adapter did not route .E01 to Dissect"
+
+          fh = container.open(path)
+          try:
+              assert isinstance(fh, EwfContainer)
+              payload = fh.read(20)
+              assert payload == b"testdissecte01\n", payload
+              assert fh.tell() == 15
+          finally:
+              fh.close()
+
+          print("validated_layer=E01/EWF container")
+          print("fixture_bytes=3547")
+          print("fixture_sha256=6e387e2fa34f4bf1278269bfecea773ec973fe3e571e98fed691ad3ac423194f")
+          print("scope=container-open-and-routing; not full Windows artifact extraction")
