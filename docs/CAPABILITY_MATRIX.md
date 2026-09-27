@@ -37,12 +37,12 @@ Requirements:
 
 ## RED / LAB — isolated forensic backend validation
 
-These capabilities stay behind `--extended-parsers` and manual integration workflows:
+These capabilities stay behind `--extended-parsers` and isolated integration workflows:
 
-- EVTX via python-evtx
+- EVTX via python-evtx — real public EVTX fixture validated; independent cross-parser comparison still pending
 - Registry / AmCache via regipy
 - MFT / USN / Prefetch / ShimCache and disk images via Dissect
-- E01 / VMDK / VHD / VHDX / RAW
+- E01 / VMDK / VHD / VHDX / RAW — E01/EWF container opening is regression-tested; full filesystem/artifact extraction remains unvalidated
 - large public corpus downloads
 
 ### Alternatives
@@ -67,3 +67,12 @@ A RED capability becomes YELLOW or GREEN only after:
 5. the capability has tests that do not require unrelated modules.
 
 Importing a package successfully is not validation.
+
+## Current validation evidence
+
+| Capability | Evidence | Status boundary |
+|---|---|---|
+| python-evtx | pinned public EVTX, fixed SHA-256, 7 canonical events / Event IDs 1 and 10 | parser path validated; cross-parser equivalence pending |
+| Dissect E01/EWF | official `small.E01` fixture, fixed SHA-256, expected logical payload | container + Pensieve routing validated; Windows filesystem/artifact extraction pending |
+
+The matrix records the **narrowest claim actually demonstrated by CI**.
