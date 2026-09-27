@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pensieve-timeline"
+dynamic = ["version"]
+description = "Cross-platform DFIR timeline, forensic reasoning and evidence-bounded OSINT in Python"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = []
+
+[project.optional-dependencies]
+docs = ["mkdocs>=1.6,<2", "mkdocs-material>=9.6,<10"]
+evtx = ["python-evtx>=0.8.1,<1"]
+registry = ["regipy>=6,<7"]
+dissect = ["dissect.target>=3,<4"]
+osint = ["gliner>=0.2"]
+llm = ["transformers>=4.51,<5", "torch>=2.6", "accelerate>=1,<2"]
+ml = ["scikit-learn>=1.5,<2"]
+knowledge = ["PyYAML>=6,<7"]
+
+[project.scripts]
+pensieve-timeline = "pensieve_timeline.cli:main"
+
+[project.urls]
+Repository = "https://github.com/Ridd1kulusC0d3r/ThePensieveProject"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pensieve_timeline.__version__"}
