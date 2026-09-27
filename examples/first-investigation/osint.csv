@@ -1,0 +1,6 @@
+Timestamp,Computer,Channel,EventID,User,ProcessId,Details
+2026-01-01T11:00:00Z,LAB-OSINT-01,ChatExport,,analyst,,"Contact ops@example.org mentioned @northbridge_lab and portal.example.org"
+2026-01-01T11:01:00Z,LAB-OSINT-01,ChatExport,,analyst,,"@northbridge_lab referenced https://portal.example.org/status"
+2026-01-01T11:02:00Z,LAB-OSINT-01,DNS,,analyst,,"Lookup for portal.example.org returned 198.51.100.25"
+2026-01-01T11:03:00Z,LAB-OSINT-01,Notes,,analyst,,"SHA256 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef associated with the sample"
+2026-01-01T11:04:00Z,LAB-OSINT-01,Notes,,analyst,,"Reference CVE-2026-12345 appeared in public research notes"
