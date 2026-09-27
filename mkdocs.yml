@@ -33,6 +33,7 @@ nav:
       - Trilha OSINT: academy/track-osint.md
       - Trilha DFIR + OSINT: academy/track-hybrid.md
       - Missão 3 — OSINT híbrido (legado): academy/mission-03-osint.md
+  - Duas VMs: deployment-vms.md
   - Google Colab: colab.md
   - Datasets: datasets.md
   - Validação v0.3: validation-v03.md
