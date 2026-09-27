@@ -21,6 +21,7 @@ osint = ["gliner>=0.2"]
 llm = ["transformers>=4.51,<5", "torch>=2.6", "accelerate>=1,<2"]
 ml = ["scikit-learn>=1.5,<2"]
 knowledge = ["PyYAML>=6,<7"]
+api = ["fastapi>=0.115,<1", "uvicorn>=0.34,<1"]
 
 [project.scripts]
 pensieve-timeline = "pensieve_timeline.cli:main"
