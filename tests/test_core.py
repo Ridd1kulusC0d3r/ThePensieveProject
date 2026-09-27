@@ -30,7 +30,7 @@ class CoreTests(unittest.TestCase):
     def test_case_db_and_report(self):
         with tempfile.TemporaryDirectory() as d:
             events=ingest([self.fixture(d)]);db=Path(d)/"case.db";save_case(db,events,correlate(events))
-            with sqlite3.connect(db) as c:self.assertEqual(c.execute("select count(*) from events").fetchone()[0],3)
+            c=sqlite3.connect(db)\n            try:self.assertEqual(c.execute("select count(*) from events").fetchone()[0],3)\n            finally:c.close()
             report=Path(d)/"report.html";build_html(events,report);text=report.read_text();self.assertIn("The Pensieve Project",text);self.assertIn("Process created",text)
     def test_errors(self):
         with tempfile.TemporaryDirectory() as d:
