@@ -1,0 +1,104 @@
+{
+  "catalog_version": "1.0",
+  "updated": "2026-09-27",
+  "sources": [
+    {
+      "id": "nist-cfreds",
+      "name": "NIST CFReDS",
+      "url": "https://cfreds.nist.gov/",
+      "kind": [
+        "forensic_images",
+        "documented_scenarios"
+      ],
+      "use": [
+        "tool_validation",
+        "training",
+        "proficiency"
+      ],
+      "colab_fit": "select_small_datasets",
+      "license_note": "verify each dataset page before redistribution"
+    },
+    {
+      "id": "otrf-security-datasets",
+      "name": "OTRF Security-Datasets",
+      "url": "https://github.com/OTRF/Security-Datasets",
+      "kind": [
+        "security_telemetry",
+        "windows_events"
+      ],
+      "use": [
+        "correlation",
+        "detection_validation",
+        "labs"
+      ],
+      "colab_fit": "good_for_selected_files",
+      "license_note": "verify repository and dataset-specific terms"
+    },
+    {
+      "id": "evtx-attack-samples",
+      "name": "EVTX-ATTACK-SAMPLES",
+      "url": "https://github.com/sbousseaden/EVTX-ATTACK-SAMPLES",
+      "kind": [
+        "evtx",
+        "sysmon",
+        "windows_events"
+      ],
+      "use": [
+        "evtx_parser_tests",
+        "event_id_lessons",
+        "detection_labs"
+      ],
+      "colab_fit": "good",
+      "license_note": "verify repository terms"
+    },
+    {
+      "id": "forensic-artifacts",
+      "name": "ForensicArtifacts/artifacts",
+      "url": "https://github.com/ForensicArtifacts/artifacts",
+      "kind": [
+        "artifact_definitions",
+        "yaml_knowledge_base"
+      ],
+      "use": [
+        "artifact_catalog",
+        "parser_planning",
+        "ai_grounding"
+      ],
+      "colab_fit": "excellent",
+      "license_note": "Apache-2.0 repository"
+    },
+    {
+      "id": "plaso",
+      "name": "log2timeline/plaso",
+      "url": "https://github.com/log2timeline/plaso",
+      "kind": [
+        "timeline_engine",
+        "parsers"
+      ],
+      "use": [
+        "interop",
+        "benchmark",
+        "reference_architecture"
+      ],
+      "colab_fit": "optional_heavy_backend",
+      "license_note": "Apache-2.0 repository"
+    },
+    {
+      "id": "dissect",
+      "name": "Fox-IT Dissect",
+      "url": "https://github.com/fox-it/dissect",
+      "kind": [
+        "forensic_framework",
+        "disk_images",
+        "artifact_parsers"
+      ],
+      "use": [
+        "optional_backend",
+        "image_parsing",
+        "cross_platform_reference"
+      ],
+      "colab_fit": "optional_backend",
+      "license_note": "respect upstream licensing"
+    }
+  ]
+}
