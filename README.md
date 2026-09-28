@@ -146,6 +146,31 @@ The recommended trust boundary keeps original evidence on the forensic VM and ha
 
 See `deploy/vm/README.md` and `docs/deployment-vms.md`.
 
+## Colab frontend
+
+A lightweight web workbench is available directly inside Google Colab:
+
+```text
+colab/pensieve_frontend.ipynb
+```
+
+It serves the Pensieve UI on port `3000` and lets you:
+
+- upload evidence;
+- choose **Forensic Core** or **AI Analyst**;
+- inspect timeline, entities, AI reasoning and generated files;
+- keep GLiNER + Qwen enabled by default in AI mode;
+- hand a canonical `timeline.jsonl` from the forensic VM to the AI pipeline without re-ingestion.
+
+Launch manually:
+
+```bash
+python -m pip install -e '.[ui,osint,llm]'
+pensieve-web --host 0.0.0.0 --port 3000
+```
+
+Then expose the kernel port through Colab. See `docs/colab-frontend.md`.
+
 ## Google Colab — First Investigation
 
 Open `colab/first_investigation.ipynb` or use the badge at the top.
@@ -229,7 +254,7 @@ Pensieve source code is MIT. Optional third-party backends keep their own licens
 
 ## Status
 
-**v0.3.0-dev6**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
+**v0.3.0-dev7**: research/development release. It is suitable for labs, parser validation, teaching and controlled analysis. It is not yet a substitute for independently validated forensic tooling in legal proceedings.
 
 
 ## AI reasoning contracts

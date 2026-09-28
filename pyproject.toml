@@ -21,10 +21,12 @@ osint = ["gliner>=0.2"]
 llm = ["transformers>=4.51,<6", "torch>=2.6", "accelerate>=1,<2"]
 ml = ["scikit-learn>=1.5,<2"]
 knowledge = ["PyYAML>=6,<7"]
+ui = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "python-multipart>=0.0.9,<1"]
 
 [project.scripts]
 pensieve-timeline = "pensieve_timeline.cli:main"
 pensieve-ops = "pensieve_timeline.ops:main"
+pensieve-web = "pensieve_timeline.webapp:main"
 
 [project.urls]
 Repository = "https://github.com/Ridd1kulusC0d3r/ThePensieveProject"

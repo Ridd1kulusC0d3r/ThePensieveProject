@@ -35,5 +35,6 @@ nav:
       - Missão 3 — OSINT híbrido (legado): academy/mission-03-osint.md
   - Duas VMs: deployment-vms.md
   - Google Colab: colab.md
+  - Frontend Colab: colab-frontend.md
   - Datasets: datasets.md
   - Validação v0.3: validation-v03.md
