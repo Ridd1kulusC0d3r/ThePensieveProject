@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/identity/banner.svg" alt="The Pensieve Project — Evidências no tempo. Hipóteses sob controle." width="100%"></p>
+
 # The Pensieve Project
 
 [![CI](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml/badge.svg)](https://github.com/Ridd1kulusC0d3r/ThePensieveProject/actions/workflows/ci.yml)
